@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>引き出し帳</title>
+<meta name="application-name" content="引き出し帳">
+<meta name="apple-mobile-web-app-title" content="引き出し帳">
+<meta name="theme-color" content="#ECEDEA">
+<link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAABuUlEQVR42u3cMRGAMBBFwWhBAQIAGVQoIA4igcEzGOAqUl32z1MAW12RMs2L9FnxCQSH4BAcgkNwCA7BITgEh+CQ4BAcgkNwCA7BITgEh+AQHBIcgkNwCA7BITgEh+AQHIJDgkNwCA7BITiUFcda76jH+g0Og8Pg8EfhgAMOOOCAAw444IADDjjggAMOOAwOg8PggAMOOOCAAw444IADDjjggAMOOAwOg8PggAMOOOCAAw444IADDjjg8ASD4BAcgkNwCA7BITgER7+Otke5XI1+BIMDDjjggAMOOOCAAw444IADDjgMDoPD4IADDjjggAMOOOCAAw444IADDjgMDoPD4IADDjjggAMOOOCAAw444IADDjgMDkuHQ55gEByCQ4JDcAgOwaEsOK5zi3K5Gv0IBgcccMABBxxwwAEHHHDAAQcccBgcBofBAQcccMABBxxwwAEHHHDAAQcccBgcBofBAQcccMABBxxwwAEHHHDAAQcccBgclg6HPMEgOASHBIfgEByCQ3AIDsEhOASH4JDgEByCQ3AIDsEhOASH4BAcgkOCQ3AIDsEhOASH4BAcgkNwSHAIDv3pBYxDN/TFOdM4AAAAAElFTkSuQmCC">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAABuUlEQVR42u3cMRGAMBBFwWhBAQIAGVQoIA4igcEzGOAqUl32z1MAW12RMs2L9FnxCQSH4BAcgkNwCA7BITgEh+CQ4BAcgkNwCA7BITgEh+AQHBIcgkNwCA7BITgEh+AQHIJDgkNwCA7BITiUFcda76jH+g0Og8Pg8EfhgAMOOOCAAw444IADDjjggAMOOAwOg8PggAMOOOCAAw444IADDjjggAMOOAwOg8PggAMOOOCAAw444IADDjjg8ASD4BAcgkNwCA7BITgER7+Otke5XI1+BIMDDjjggAMOOOCAAw444IADDjgMDoPD4IADDjjggAMOOOCAAw444IADDjgMDoPD4IADDjjggAMOOOCAAw444IADDjgMDkuHQ55gEByCQ4JDcAgOwaEsOK5zi3K5Gv0IBgcccMABBxxwwAEHHHDAAQcccBgcBofBAQcccMABBxxwwAEHHHDAAQcccBgcBofBAQcccMABBxxwwAEHHHDAAQcccBgclg6HPMEgOASHBIfgEByCQ3AIDsEhOASH4JDgEByCQ3AIDsEhOASH4BAcgkOCQ3AIDsEhOASH4BAcgkNwSHAIDv3pBYxDN/TFOdM4AAAAAElFTkSuQmCC">
 <style>
   :root{
     --paper:#ECEDEA; --card:#FFFFFF; --ink:#22303C; --ink-weak:#6B7A86;
@@ -76,6 +81,19 @@
   .empty[hidden]{display:none}
   footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);font-size:12px;color:var(--ink-weak)}
   footer p{margin:0 0 4px}
+  /* 狭い画面では検索欄の文字を少し小さくする。
+     iOS は 16px 未満の入力欄にフォーカスすると勝手にズームするので、16px は割らない */
+  @media (max-width:480px){
+    .wrap{padding:20px 14px 64px}
+    #q{font-size:18px}
+  }
+  /* 指で操作する端末では、押す場所を 44px 以上にする */
+  @media (pointer:coarse){
+    #q{padding-right:48px}
+    #clear{top:0;height:100%;min-width:44px;padding:0}
+    .cat{min-height:44px;padding:8px 14px;font-size:14px}
+    summary{min-height:48px}
+  }
   @media (prefers-reduced-motion:no-preference){
     .body{animation:open .16s ease-out}
     @keyframes open{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
@@ -114,7 +132,7 @@
 <p class="empty" id="empty" hidden>その症状のカードはまだない。<br>今回どう対処したかを、あとで1枚書いておく。</p>
 
 <footer>
-  <p>生成 2026/11/14 22:02 ／ 公開 1 枚（非公開 0 枚・未完成 0 枚）</p>
+  <p>生成 2026/11/14 22:07 ／ 公開 1 枚（非公開 0 枚・未完成 0 枚）</p>
   <p>公開版のため、人名・社名・案件名は書かない。具体例はローカルの vault 側に置く。</p>
 </footer>
 
