@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>引き出し帳</title>
+<style>
+  :root{
+    --paper:#ECEDEA; --card:#FFFFFF; --ink:#22303C; --ink-weak:#6B7A86;
+    --rule:#D2D6D1; --mark:#9B2C2C;
+    --c-taijin:#3D6B8C; --c-task:#5C7A56; --c-mgmt:#8A6A3E;
+    --c-handan:#7A5580; --c-jibun:#4F6E6E;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Meiryo UI",Meiryo,"Hiragino Sans","Yu Gothic UI",sans-serif;
+    font-size:15px; line-height:1.75;
+  }
+  .wrap{max-width:740px;margin:0 auto;padding:32px 20px 80px}
+  header{padding:8px 0 4px}
+  h1{font-size:15px;font-weight:700;letter-spacing:.08em;margin:0 0 20px;color:var(--ink-weak)}
+  .searchbox{position:relative}
+  #q{
+    width:100%; font-family:inherit; font-size:22px; font-weight:700;
+    color:var(--ink); background:transparent; border:none;
+    border-bottom:2px solid var(--ink); padding:10px 34px 12px 0; outline:none;
+  }
+  #q::placeholder{color:#A9B2B8;font-weight:400}
+  #q:focus{border-bottom-color:var(--mark)}
+  #clear{
+    position:absolute;right:0;top:12px;background:none;border:none;cursor:pointer;
+    font-family:inherit;font-size:20px;color:var(--ink-weak);padding:0 4px;line-height:1;
+  }
+  #clear[hidden]{display:none}
+  .count{margin:10px 0 26px;font-size:13px;color:var(--ink-weak)}
+  .count b{color:var(--mark);font-weight:700}
+  .cats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+  .cat{
+    font-family:inherit;font-size:13px;background:transparent;color:var(--ink-weak);
+    border:1px solid var(--rule);border-radius:2px;padding:4px 11px;cursor:pointer;
+  }
+  .cat:hover{border-color:var(--ink-weak)}
+  .cat[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .card{
+    background:var(--card);border:1px solid var(--rule);
+    border-left:4px solid var(--line,var(--rule));margin-bottom:10px;
+  }
+  .card[hidden]{display:none}
+  .card[data-cat="対人"]{--line:var(--c-taijin)}
+  .card[data-cat="タスクと段取り"]{--line:var(--c-task)}
+  .card[data-cat="マネジメント"]{--line:var(--c-mgmt)}
+  .card[data-cat="判断"]{--line:var(--c-handan)}
+  .card[data-cat="自分"]{--line:var(--c-jibun)}
+  summary{list-style:none;cursor:pointer;padding:13px 16px;display:flex;align-items:baseline;gap:10px}
+  summary::-webkit-details-marker{display:none}
+  summary:focus-visible{outline:2px solid var(--mark);outline-offset:-2px}
+  .title{font-weight:700;flex:1}
+  .cat-tag{font-size:12px;color:var(--ink-weak);white-space:nowrap}
+  details[open] summary{border-bottom:1px solid var(--rule)}
+  .body{padding:14px 16px 18px}
+  .body h3{font-size:13px;font-weight:700;color:var(--ink-weak);margin:16px 0 4px}
+  .body h3:first-child{margin-top:0}
+  .body p{margin:0}
+  .body ul{margin:0;padding-left:1.3em}
+  .body li{margin-bottom:3px}
+  .body li b{color:var(--mark)}
+  .meta{margin-top:18px;padding-top:12px;border-top:1px dotted var(--rule);font-size:13px;color:var(--ink-weak)}
+  .tags{margin-top:6px}
+  .tags span{
+    display:inline-block;font-size:12px;color:var(--ink-weak);
+    border:1px solid var(--rule);border-radius:2px;padding:1px 7px;margin:2px 4px 0 0;
+  }
+  .empty{padding:40px 4px;color:var(--ink-weak)}
+  .empty[hidden]{display:none}
+  footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--rule);font-size:12px;color:var(--ink-weak)}
+  footer p{margin:0 0 4px}
+  @media (prefers-reduced-motion:no-preference){
+    .body{animation:open .16s ease-out}
+    @keyframes open{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>引き出し帳</h1>
+  <div class="searchbox">
+    <input id="q" type="search" placeholder="いま困っていることを打つ（例：報告 上がってこない）" autocomplete="off">
+    <button id="clear" hidden aria-label="検索を消す">×</button>
+  </div>
+  <p class="count"><b id="n">1</b> 件 / 全 1 件</p>
+</header>
+
+<div class="cats" id="cats">
+  <button class="cat" aria-pressed="true" data-cat="">すべて</button>
+  <button class="cat" aria-pressed="false" data-cat="対人">対人</button>
+  <button class="cat" aria-pressed="false" data-cat="タスクと段取り">タスクと段取り</button>
+  <button class="cat" aria-pressed="false" data-cat="マネジメント">マネジメント</button>
+  <button class="cat" aria-pressed="false" data-cat="判断">判断</button>
+  <button class="cat" aria-pressed="false" data-cat="自分">自分</button>
+</div>
+
+<main id="list">
+
+  <details class="card" data-cat="自分">
+    <summary><span class="title">着手しようとすると手が止まる</span><span class="cat-tag">自分</span></summary>
+    <div class="body"><h3>症状</h3><p>やることは分かっているのに、別の軽い作業に逃げてしまう。<br>だいたい最初の一手が決まっていない時に起きる。</p><h3>有効な手</h3><ul><li>タスク名を<b>動詞1つの粒度まで割る</b>。「設計書を書く」→「目次を3行書く」</li><li>終業前に<b>翌朝の最初の一手だけ決めておく</b></li></ul><h3>効果が無かった場面</h3><p>単に情報が足りない時。逃避ではないので、誰に聞くかを決める。</p><div class="meta">自分の経験<div class="tags"><span>#集中</span><span>#習慣</span></div></div></div>
+  </details>
+</main>
+
+<p class="empty" id="empty" hidden>その症状のカードはまだない。<br>今回どう対処したかを、あとで1枚書いておく。</p>
+
+<footer>
+  <p>生成 2026/11/14 22:02 ／ 公開 1 枚（非公開 0 枚・未完成 0 枚）</p>
+  <p>公開版のため、人名・社名・案件名は書かない。具体例はローカルの vault 側に置く。</p>
+</footer>
+
+</div>
+<script>
+(function(){
+  var q = document.getElementById('q');
+  var clear = document.getElementById('clear');
+  var cards = Array.prototype.slice.call(document.querySelectorAll('.card'));
+  var n = document.getElementById('n');
+  var empty = document.getElementById('empty');
+  var cat = '';
+
+  function apply(){
+    var terms = q.value.trim().toLowerCase().split(/[\s　]+/).filter(Boolean);
+    var hit = 0;
+    cards.forEach(function(c){
+      var text = c.textContent.toLowerCase();
+      var ok = (!cat || c.dataset.cat === cat) &&
+               terms.every(function(t){ return text.indexOf(t) !== -1; });
+      c.hidden = !ok;
+      if(ok) hit++;
+      if(!ok) c.open = false;
+    });
+    n.textContent = hit;
+    empty.hidden = hit !== 0;
+    clear.hidden = q.value === '';
+    if(hit === 1 && terms.length){
+      cards.forEach(function(c){ if(!c.hidden) c.open = true; });
+    }
+  }
+
+  q.addEventListener('input', apply);
+  clear.addEventListener('click', function(){ q.value=''; apply(); q.focus(); });
+  document.getElementById('cats').addEventListener('click', function(e){
+    var b = e.target.closest('.cat');
+    if(!b) return;
+    cat = b.dataset.cat;
+    this.querySelectorAll('.cat').forEach(function(x){
+      x.setAttribute('aria-pressed', String(x === b));
+    });
+    apply();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === '/' && document.activeElement !== q){ e.preventDefault(); q.focus(); }
+  });
+})();
+</script>
+</body>
+</html>
